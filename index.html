@@ -4,13 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
     <title>Quiz App</title>
   </head>
   <body>
     <div class="container">
       <h1>QUIZ!</h1>
 
-      <section class="question">
+      <div class="modal"><div class="modal-content">
+        Feedback
+      </div></div>
+
+      <section class="info">
+        <div class="score"><button>Score: 1/10</button></div>
+        <div class="timer"><button>Timer: 1.00</button></div>
+      </section>
+
+      <!-- <section class="question">
         How do you find the number with the highest value of x and y?
       </section>
 
@@ -30,7 +40,7 @@
         <div class="option-d">
           <button type="submit">D) Math.max(x, y)</button>
         </div>
-      </section>
+      </section> -->
     </div>
 
     <script src="app.js"></script>
