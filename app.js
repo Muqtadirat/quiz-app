@@ -1,34 +1,46 @@
 const apiKey = "THESg9A5h66o7cvIAm9HRpNySrGJBdlPoyEExLMN";
-const apiUrl = `https://quizapi.io/api/v1/questions?apiKey=${apiKey}&category=code&limit=10&tags=JavaScript`;
+const apiUrl = `https://quizapi.io/api/v1/questions?apiKey=${apiKey}&category=code&limit=20&tags=JavaScript`;
 
 const container = document.querySelector(".container");
-const modal = document.querySelector(".modal");
-const feedback = document.querySelector(".modal-content");
-const timer = document.querySelector(".timer");
+
+function startQuiz() {
+  document.querySelector("#start-button").style.display = "none";
+
+  createQuiz();
+
+  axios
+    .get(apiUrl)
+    .then((response) => {
+      handleQuiz(response);
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+    });
+}
 
 function createQuiz() {
   const quizBody = document.createElement("section");
 
   quizBody.innerHTML = `
       <section class="question">
-        How do you find the number with the highest value of x and y?
+     
       </section>
 
       <section class="options">
         <div class="option-a">
-          <button type="submit">A) ceil(x, y)</button>
+          <button type="submit"></button>
         </div>
 
         <div class="option-b">
-          <button type="submit">B) Math.ceil(x, y)</button>
+          <button type="submit"></button>
         </div>
 
         <div class="option-c">
-          <button type="submit">C) top(x, y)</button>
+          <button type="submit"></button>
         </div>
 
         <div class="option-d">
-          <button type="submit">D) Math.max(x, y)</button>
+          <button type="submit"></button>
         </div>
       </section>
     `;
@@ -36,20 +48,19 @@ function createQuiz() {
   container.append(quizBody);
 }
 
-createQuiz();
-
-const questionText = document.querySelector(".question");
-const optionA = document.querySelector(".option-a button");
-const optionB = document.querySelector(".option-b button");
-const optionC = document.querySelector(".option-c button");
-const optionD = document.querySelector(".option-d button");
-const scoreBody = document.querySelector(".score");
-
-let correctAnswer = "";
-let score = 0;
-
 //Display question
 function handleQuiz(response) {
+  const modal = document.querySelector(".modal");
+  const feedback = document.querySelector(".modal-content");
+  const questionText = document.querySelector(".question");
+  const optionA = document.querySelector(".option-a button");
+  const optionB = document.querySelector(".option-b button");
+  const optionC = document.querySelector(".option-c button");
+  const optionD = document.querySelector(".option-d button");
+  const scoreBody = document.querySelector(".score");
+
+  let correctAnswer = "";
+  let score = 0;
   let currentQuestionIndex = 0;
   const questions = response.data;
 
@@ -91,7 +102,7 @@ function handleQuiz(response) {
       modal.style.display = "flex";
       feedback.textContent = "Yayy, correct!";
       feedback.style.backgroundColor = "#00FF00";
-      score++
+      score++;
       scoreBody.innerHTML = score;
     } else {
       modal.style.display = "flex";
@@ -108,18 +119,19 @@ function handleQuiz(response) {
       setTimeout(() => {
         currentQuestionIndex++;
 
-        if (currentQuestionIndex < questions.length) {
+        if (currentQuestionIndex <= 10) {
           setQuiz(currentQuestionIndex);
         } else {
           alert("Quiz completed!");
-          // You might want to handle completion logic here
         }
-      }, 500); // Adjust the delay as needed
+      }, 500);
     }, 2000);
   };
 }
 
 let seconds = 60;
+const timer = document.querySelector(".timer");
+
 const handleTimer = setInterval(() => {
   seconds--;
   timer.textContent = seconds;
@@ -130,12 +142,4 @@ const handleTimer = setInterval(() => {
   }
 }, 1000);
 
-axios
-  .get(apiUrl)
-  .then((response) => {
-    // setQuiz(response);
-    handleQuiz(response);
-  })
-  .catch((error) => {
-    console.error("Error fetching data:", error);
-  });
+document.querySelector("#start-button").addEventListener("click", startQuiz);
