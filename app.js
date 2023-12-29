@@ -2,11 +2,24 @@ const apiKey = "THESg9A5h66o7cvIAm9HRpNySrGJBdlPoyEExLMN";
 const apiUrl = `https://quizapi.io/api/v1/questions?apiKey=${apiKey}&category=code&limit=20&tags=JavaScript`;
 
 const container = document.querySelector(".container");
+const viewRulesButton = document.querySelector("#start-button");
+const cancelQuizButton = document.querySelector(".cancel-quiz");
+
+viewRulesButton.addEventListener("click", function () {
+  document.querySelector("#rules").style.display = "flex";
+  viewRulesButton.style.display = "none";
+});
+
+cancelQuizButton.addEventListener("click", function () {
+  document.querySelector("#rules").style.display = "none";
+  viewRulesButton.style.display = "block";
+});
 
 function startQuiz() {
-  document.querySelector("#start-button").style.display = "none";
+  document.querySelector("#rules").style.display = "none";
 
   createQuiz();
+  // handleTimer();
 
   axios
     .get(apiUrl)
@@ -50,7 +63,7 @@ function createQuiz() {
 
 //Display question
 function handleQuiz(response) {
-  const modal = document.querySelector(".modal");
+  const feedbackModal = document.querySelector(".feedback-modal");
   const feedback = document.querySelector(".modal-content");
   const questionText = document.querySelector(".question");
   const optionA = document.querySelector(".option-a button");
@@ -99,47 +112,47 @@ function handleQuiz(response) {
   //user feedback for answers
   const checkAnswer = (selectedAnswer) => {
     if (selectedAnswer === correctAnswer) {
-      modal.style.display = "flex";
+      feedbackModal.style.display = "flex";
       feedback.textContent = "Yayy, correct!";
       feedback.style.backgroundColor = "#00FF00";
       score++;
       scoreBody.innerHTML = score;
     } else {
-      modal.style.display = "flex";
+      feedbackModal.style.display = "flex";
       feedback.textContent = "Oof, wrong!";
       feedback.style.backgroundColor = "#FF0000";
     }
 
-    console.log(score);
-
     setTimeout(() => {
-      modal.style.display = "none";
+      feedbackModal.style.display = "none";
 
       // Move to next question after a delay
       setTimeout(() => {
         currentQuestionIndex++;
 
-        if (currentQuestionIndex <= 10) {
+        if (currentQuestionIndex <= 15) {
           setQuiz(currentQuestionIndex);
         } else {
           alert("Quiz completed!");
         }
       }, 500);
-    }, 2000);
+    }, 1500);
   };
 }
 
+let minutes = 4;
 let seconds = 60;
-const timer = document.querySelector(".timer");
+const timerDisplay = document.querySelector(".timer");
 
 const handleTimer = setInterval(() => {
   seconds--;
-  timer.textContent = seconds;
+  timerDisplay.textContent = `${minutes}:${seconds}`;
   if (seconds === 0) {
-    seconds = 60;
-  } else if (seconds <= 15) {
-    timer.style.color = "red";
+    minutes--;
+    seconds = 59;
+  } else if (minutes === 0 && seconds <= 60) {
+    timerDisplay.style.color = "red";
   }
 }, 1000);
 
-document.querySelector("#start-button").addEventListener("click", startQuiz);
+document.querySelector(".start-quiz").addEventListener("click", startQuiz);
