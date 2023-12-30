@@ -1,5 +1,3 @@
-const apiKey = "THESg9A5h66o7cvIAm9HRpNySrGJBdlPoyEExLMN";
-const apiUrl = `https://quizapi.io/api/v1/questions?apiKey=${apiKey}&category=code&limit=20&tags=JavaScript`;
 
 const container = document.querySelector(".container");
 const viewRulesButton = document.querySelector("#start-button");
