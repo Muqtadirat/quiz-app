@@ -33,6 +33,7 @@ function startQuiz() {
 
 function createQuiz() {
   const quizBody = document.createElement("section");
+  quizBody.id = "quiz-body";
 
   quizBody.innerHTML = `
       <section class="question">
@@ -80,7 +81,9 @@ function handleQuiz(response) {
   const setQuiz = (index) => {
     const currentQuestion = questions[index];
 
-    questionText.textContent = `${currentQuestion.question}`;
+    questionText.textContent = `${currentQuestionIndex + 1}. ${
+      currentQuestion.question
+    }`;
     optionA.textContent = `A) ${currentQuestion.answers.answer_a}`;
     optionB.textContent = `B) ${currentQuestion.answers.answer_b}`;
     optionC.textContent = `C) ${currentQuestion.answers.answer_c}`;
@@ -109,6 +112,32 @@ function handleQuiz(response) {
     checkAnswer("answer_d_correct");
   });
 
+  //Display result
+  function resultDisplay() {
+    feedbackModal.style.display = "flex";
+
+    if (score === 15) {
+      feedback.textContent = `Wow, you scored ${score}/15 `;
+      feedback.style.backgroundColor = "#a379fa";
+    } else if (score > 5 && score <= 14) {
+      feedback.textContent = `Congrats, you scored ${score}/15 `;
+      feedback.style.backgroundColor = "#6e61ff";
+    } else if (score > 0 && score <= 5) {
+      feedback.textContent = `Hmm, you should study. ${score}/15 `;
+      feedback.style.backgroundColor = "#fff";
+    } else {
+      feedback.textContent = `Well, that was something... ${score}/15 `;
+      feedback.style.backgroundColor = "#FF0000";
+    }
+
+    // Restart quiz
+    setTimeout(() => {
+      feedbackModal.style.display = "none";
+      document.querySelector("#rules").style.display = "flex";
+      document.getElementById("quiz-body").style.display = "none";
+    }, 1500);
+  }
+
   //user feedback for answers
   const checkAnswer = (selectedAnswer) => {
     if (selectedAnswer === correctAnswer) {
@@ -130,10 +159,10 @@ function handleQuiz(response) {
       setTimeout(() => {
         currentQuestionIndex++;
 
-        if (currentQuestionIndex <= 15) {
+        if (currentQuestionIndex < 15) {
           setQuiz(currentQuestionIndex);
         } else {
-          alert("Quiz completed!");
+          resultDisplay();
         }
       }, 500);
     }, 1500);
@@ -152,6 +181,8 @@ const handleTimer = setInterval(() => {
     seconds = 59;
   } else if (minutes === 0 && seconds <= 60) {
     timerDisplay.style.color = "red";
+  } else if (minutes === 0 && seconds === 0) {
+    clearInterval(handleTimer);
   }
 }, 1000);
 
