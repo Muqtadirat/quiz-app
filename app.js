@@ -1,8 +1,13 @@
-
 const container = document.querySelector(".container");
+const feedbackModal = document.querySelector(".feedback-modal");
+const feedback = document.querySelector(".modal-content");
+const scoreBody = document.querySelector(".score");
 const viewRulesButton = document.querySelector("#start-button");
 const cancelQuizButton = document.querySelector(".cancel-quiz");
 
+let score = 0;
+
+// Open rules modal
 viewRulesButton.addEventListener("click", function () {
   document.querySelector("#rules").style.display = "flex";
   viewRulesButton.style.display = "none";
@@ -17,7 +22,7 @@ function startQuiz() {
   document.querySelector("#rules").style.display = "none";
 
   createQuiz();
-  // handleTimer();
+  startTimer();
 
   axios
     .get(apiUrl)
@@ -32,6 +37,13 @@ function startQuiz() {
 function createQuiz() {
   const quizBody = document.createElement("section");
   quizBody.id = "quiz-body";
+
+  // Reset quiz display
+  const existingQuizBody = document.getElementById("quiz-body");
+
+  if (existingQuizBody) {
+    existingQuizBody.remove();
+  }
 
   quizBody.innerHTML = `
       <section class="question">
@@ -60,19 +72,41 @@ function createQuiz() {
   container.append(quizBody);
 }
 
+//Display result
+function resultDisplay() {
+  feedbackModal.style.display = "flex";
+
+  if (score === 15) {
+    feedback.textContent = `Wow, you scored ${score}/15 `;
+    feedback.style.backgroundColor = "#a379fa";
+  } else if (score > 5 && score <= 14) {
+    feedback.textContent = `Congrats, you scored ${score}/15 `;
+    feedback.style.backgroundColor = "#6e61ff";
+  } else if (score > 0 && score <= 5) {
+    feedback.textContent = `Hmm, you should study. ${score}/15 `;
+    feedback.style.backgroundColor = "#fff";
+  } else {
+    feedback.textContent = `Well, that was something... ${score}/15 `;
+    feedback.style.backgroundColor = "#FF0000";
+  }
+
+  // Restart quiz / return to rules screen
+  setTimeout(() => {
+    feedbackModal.style.display = "none";
+    document.querySelector("#rules").style.display = "flex";
+    document.getElementById("quiz-body").style.display = "none";
+  }, 3000);
+}
+
 //Display question
 function handleQuiz(response) {
-  const feedbackModal = document.querySelector(".feedback-modal");
-  const feedback = document.querySelector(".modal-content");
   const questionText = document.querySelector(".question");
   const optionA = document.querySelector(".option-a button");
   const optionB = document.querySelector(".option-b button");
   const optionC = document.querySelector(".option-c button");
   const optionD = document.querySelector(".option-d button");
-  const scoreBody = document.querySelector(".score");
 
   let correctAnswer = "";
-  let score = 0;
   let currentQuestionIndex = 0;
   const questions = response.data;
 
@@ -110,32 +144,6 @@ function handleQuiz(response) {
     checkAnswer("answer_d_correct");
   });
 
-  //Display result
-  function resultDisplay() {
-    feedbackModal.style.display = "flex";
-
-    if (score === 15) {
-      feedback.textContent = `Wow, you scored ${score}/15 `;
-      feedback.style.backgroundColor = "#a379fa";
-    } else if (score > 5 && score <= 14) {
-      feedback.textContent = `Congrats, you scored ${score}/15 `;
-      feedback.style.backgroundColor = "#6e61ff";
-    } else if (score > 0 && score <= 5) {
-      feedback.textContent = `Hmm, you should study. ${score}/15 `;
-      feedback.style.backgroundColor = "#fff";
-    } else {
-      feedback.textContent = `Well, that was something... ${score}/15 `;
-      feedback.style.backgroundColor = "#FF0000";
-    }
-
-    // Restart quiz
-    setTimeout(() => {
-      feedbackModal.style.display = "none";
-      document.querySelector("#rules").style.display = "flex";
-      document.getElementById("quiz-body").style.display = "none";
-    }, 1500);
-  }
-
   //user feedback for answers
   const checkAnswer = (selectedAnswer) => {
     if (selectedAnswer === correctAnswer) {
@@ -167,21 +175,44 @@ function handleQuiz(response) {
   };
 }
 
-let minutes = 4;
-let seconds = 60;
-const timerDisplay = document.querySelector(".timer");
+function startTimer() {
+  let minutes = 4;
+  let seconds = 60;
+  const timerDisplay = document.querySelector(".timer");
 
-const handleTimer = setInterval(() => {
-  seconds--;
-  timerDisplay.textContent = `${minutes}:${seconds}`;
-  if (seconds === 0) {
-    minutes--;
-    seconds = 59;
-  } else if (minutes === 0 && seconds <= 60) {
-    timerDisplay.style.color = "red";
-  } else if (minutes === 0 && seconds === 0) {
-    clearInterval(handleTimer);
-  }
-}, 1000);
+  const handleTimer = setInterval(() => {
+    seconds--;
+    if (seconds < 0) {
+      if (minutes > 0) {
+        minutes--;
+        seconds = 59;
+      } else {
+        clearInterval(handleTimer);
+        submitQuiz();
+        return;
+      }
+    }
+
+    timerDisplay.textContent = `${minutes}:${
+      seconds < 10 ? "0" : ""
+    }${seconds}`;
+
+    if (minutes === 0 && seconds <= 59) {
+      timerDisplay.style.color = "red";
+    }
+  }, 1000);
+}
 
 document.querySelector(".start-quiz").addEventListener("click", startQuiz);
+
+function submitQuiz() {
+  setTimeout(() => {
+    feedbackModal.style.display = "flex";
+    feedback.textContent = "Time's up!";
+    feedback.style.backgroundColor = "#FF0000";
+
+    setTimeout(() => {
+      resultDisplay();
+    }, 3000);
+  }, 1000);
+}
