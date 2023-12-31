@@ -5,6 +5,7 @@ const scoreBody = document.querySelector(".score");
 const viewRulesButton = document.querySelector("#start-button");
 const cancelQuizButton = document.querySelector(".cancel-quiz");
 
+let timerInterval;
 let score = 0;
 
 // Open rules modal
@@ -23,15 +24,7 @@ function startQuiz() {
 
   createQuiz();
   startTimer();
-
-  axios
-    .get(apiUrl)
-    .then((response) => {
-      handleQuiz(response);
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
-    });
+  fetchData();
 }
 
 function createQuiz() {
@@ -95,6 +88,12 @@ function resultDisplay() {
     feedbackModal.style.display = "none";
     document.querySelector("#rules").style.display = "flex";
     document.getElementById("quiz-body").style.display = "none";
+
+    // Resets score and timer
+    score = 0;
+    scoreBody.innerHTML = score;
+    clearInterval(timerInterval);
+    document.querySelector(".timer").innerHTML = "";
   }, 3000);
 }
 
@@ -180,14 +179,14 @@ function startTimer() {
   let seconds = 60;
   const timerDisplay = document.querySelector(".timer");
 
-  const handleTimer = setInterval(() => {
+  timerInterval = setInterval(() => {
     seconds--;
     if (seconds < 0) {
       if (minutes > 0) {
         minutes--;
         seconds = 59;
       } else {
-        clearInterval(handleTimer);
+        clearInterval(timerInterval);
         submitQuiz();
         return;
       }
@@ -203,8 +202,6 @@ function startTimer() {
   }, 1000);
 }
 
-document.querySelector(".start-quiz").addEventListener("click", startQuiz);
-
 function submitQuiz() {
   setTimeout(() => {
     feedbackModal.style.display = "flex";
@@ -216,3 +213,16 @@ function submitQuiz() {
     }, 3000);
   }, 1000);
 }
+
+function fetchData() {
+  axios
+    .get(apiUrl)
+    .then((response) => {
+      handleQuiz(response);
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+    });
+}
+
+document.querySelector(".start-quiz").addEventListener("click", startQuiz);
