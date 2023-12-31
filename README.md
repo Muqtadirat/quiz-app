@@ -19,7 +19,7 @@ The Quiz Application is designed to provide an interactive quiz experience for u
 
 ## Live Preview
 
-To preview the application, click <a href="https://courageous-swan-203f3c.netlify.app/">here</a>
+To preview the application, click <a href="https://courageous-swan-203f3c.netlify.app/" target="_blank">here</a>
 
 ## Features
 
